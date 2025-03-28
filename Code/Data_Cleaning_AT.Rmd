@@ -1,0 +1,281 @@
+---
+title: "Data Cleaning"
+author: "Group 8: Molly Grubb, Victoria Ngo, Anna Tramposch, Afia Tyus, Ying Xu"
+date: "2025-02-11"
+output: html_document
+---
+
+# Importing the Data
+
+```{r}
+# install.packages("pacman")
+library(pacman)
+pacman::p_load(here,readxl,haven,tidyverse)
+
+```
+
+```{r}
+
+#for everyone before running your code type this in your console
+getwd() # confirm you're in the shared folder
+
+# here-i-am
+here::i_am("Code/Data_Cleaning_AT.Rmd")
+
+tkd_raw <- read_excel(here::here("Data/Takunda PaBS Data 2024.xlsx"))
+
+ttk_raw <- read_sav(here::here("Data/data2024version1.sav"))
+
+tkd_cleaned <- tkd_raw
+ttk_cleaned <- ttk_raw
+```
+
+# Filtering and renaming columns
+
+## TKD
+
+```{r}
+
+# TKD variable name reading in 
+TKD_names <- read_excel(here::here("Data/TKD_Var_Names_AT.xlsx"))
+  TKD_var_names <- TKD_names %>% pull(`Takunda Variable Names`)
+  TKD_new_names <- TKD_names %>% pull(`New Names`)
+
+  # mapping the old and new names together
+  TKD_rename_mapping <- setNames(TKD_var_names,TKD_new_names)
+  
+# selecting variables of interest
+tkd_cleaned <- tkd_cleaned %>%
+  # add all the column names of interest from tkd
+  dplyr::select(all_of(TKD_var_names)) %>% 
+# renaming variables with new names
+  dplyr::rename(!!!TKD_rename_mapping)
+
+# adding a new identifying column
+tkd_cleaned$program <- "TAKUNDA"
+
+```
+
+### Changing coding of variables
+
+```{r}
+
+# changing everything to character (most likely variable for all and won't change values)
+tkd_cleaned <- tkd_cleaned %>%
+  mutate(across(everything(), as.character))
+
+# sex coded correctly
+table(tkd_cleaned$Sex)
+
+# changing of Age
+tkd_cleaned$Age <- as.numeric(tkd_cleaned$Age)
+summary(tkd_cleaned$Age)
+
+# gendered household type coded correctly
+table(tkd_cleaned$Gendered_HH_Type)
+
+
+# changing KFP to numeric
+tkd_cleaned <- tkd_cleaned %>%
+  mutate(across(starts_with('KFP_'), as.numeric))
+class(tkd_cleaned$KFP_Initiation)
+table(tkd_cleaned$KFP_Comp_Feed)
+# changing participation to numeric
+
+tkd_participation_variables <- c("Participate_WASH", "Participate_CareGroup", "Participate_CashTransfer", "Participate_Disaster", "Participate_FFB", "Participate_GenderedClimate", "Participate_IGA", "Participate_Natural", "Participate_PTS", "Participate_ResilienceDesign", "Participate_SAADialoguesGender", "Participate_SuppFeeding", "Participate_TVET", "Participate_VillageSavings")
+
+tkd_cleaned[tkd_participation_variables] <- sapply(tkd_cleaned[tkd_participation_variables], as.numeric)
+
+class(tkd_cleaned$Partcipate_WASH)
+
+#changing household composition to numeric
+household_convert <- c("Female_15_29", "Female_30", "Men_15_29", "Men_30")
+# converting this set of variables to numeric
+  tkd_cleaned <- tkd_cleaned %>% mutate(across(all_of(household_convert), as.numeric))
+
+# changing frame to numeric
+tkd_cleaned$Frame1_3 <- as.numeric(tkd_cleaned$Frame1_3)
+tkd_cleaned$Frame3 <- as.numeric(tkd_cleaned$Frame3)
+
+
+
+```
+
+## TTK
+
+```{r}
+
+# TTK variable name reading in
+TTK_names <- read_excel(here::here("Data/TTK_Var_Names_AT.xlsx"))
+  TTK_var_names <- TTK_names %>% pull(`Titikulane Names`)
+  TTK_new_names <- TTK_names %>% pull(`New Names`)
+  
+  # mapping the old and new names together
+  TTK_rename_mapping <- setNames(TTK_var_names, TTK_new_names)
+
+
+ttk_cleaned <- ttk_cleaned %>%
+  dplyr::select(all_of(TTK_var_names)) %>%
+  rename(!!!TTK_rename_mapping)
+
+# adding a new identifying column
+ttk_cleaned$program <- "TITUKULANE"
+
+```
+
+### Changing coding of variables
+
+```{r}
+
+# changing everything to character (most likely variable for all and won't change values)
+ttk_cleaned <- ttk_cleaned %>%
+  mutate(across(everything(), as.character))
+
+
+# changing coding of sex
+table(ttk_cleaned$Sex)
+ttk_cleaned <- ttk_cleaned %>% 
+  mutate(Sex = case_when(
+    Sex == 1 ~ "Male",
+    Sex == 2 ~ "Female"
+  ))
+
+# changing of Age
+ttk_cleaned$Age <- as.numeric(ttk_cleaned$Age)
+summary(ttk_cleaned$Age)
+
+
+# changing coding of gendered household type
+table(ttk_cleaned$Gendered_HH_Type)
+ttk_cleaned <- ttk_cleaned %>% 
+  mutate(Gendered_HH_Type = case_when(
+    Gendered_HH_Type == 1 ~ "Adult Male no Adult Female (MnF)",
+    Gendered_HH_Type == 2 ~ "Adult Female no Adult Male (FnM)",
+    Gendered_HH_Type == 3 ~ "Adult Male and Adult Female (M&F)",
+    Gendered_HH_Type == 4 ~ "Female Child no Adults (CNAF)",
+    Gendered_HH_Type == 5 ~ "Male Child no Adults (CNAM)",
+  ))
+
+table(tkd_cleaned$Gendered_HH_Type)
+
+
+# changing source to numeric
+ttk_cleaned <- ttk_cleaned %>%
+  mutate(across(starts_with('source_'), as.numeric))
+
+# changing KFP to numeric
+ttk_cleaned <- ttk_cleaned %>%
+  mutate(across(starts_with('KFP_'), as.numeric))
+
+
+# changing 1 and 2 to 0 and 1
+ttk_cleaned <- ttk_cleaned %>%
+  mutate(across(starts_with('KFP_'), ~ case_when(
+    . == 1 ~ 0,  # Change 1 to 0
+    . == 2 ~ 1,  # Change 2 to 1
+    TRUE ~ .      # Keep other values as they are
+  )))
+
+
+# changing participation to numeric
+
+ttk_participation_variables <- c("Participate_AgrLoan","Participate_CareGroup",
+"Participate_CashTransfer", "Participate_CommSupp", "Participate_Disaster", "Participate_DykeCon","Participate_IGA", "Participate_Irrigation", "Participate_Livestock",  "Participate_Marketing", "Participate_Meg", "Participate_Natural", "Participate_Radio", "Participate_SAADialoguesGender", "Participate_TVET_formal", "Participate_TVET_informal", "Participate_VillageSavings", "Participate_WASH", "Participate_WaterManage", "Participate_YouthGroup")
+
+ttk_cleaned[ttk_participation_variables] <- sapply(ttk_cleaned[ttk_participation_variables], as.numeric)
+
+
+# changing 1 and 2 to 0 and 1
+ttk_cleaned <- ttk_cleaned %>%
+  mutate(across(starts_with('Participate_'), ~ case_when(
+    . == 1 ~ 0,  # Change 1 to 0
+    . == 2 ~ 1,  # Change 2 to 1
+    TRUE ~ .      # Keep other values as they are
+  )))
+
+
+table(ttk_cleaned$Participate_CommSupp)
+
+#changing household composition to numeric
+household_convert <- c("Female_15_29", "Female_30", "Men_15_29", "Men_30")
+# converting this set of variables to numeric
+  ttk_cleaned <- ttk_cleaned %>% mutate(across(all_of(household_convert), as.numeric))
+  
+ttk_cleaned$frame_c06 <- as.character(ttk_cleaned$frame_c06)
+table(ttk_cleaned$frame_c06)
+
+```
+
+# Merging data sets
+
+```{r}
+
+# joining the two cleaned data sets
+cleaned_data <- full_join(tkd_cleaned, ttk_cleaned)
+
+
+names(cleaned_data)
+```
+
+# Exporting to excel
+
+```{r}
+
+# exporting the merged data sets to the data files folder
+write_csv(cleaned_data, file = here::here("03_CARE data files/cleaned_data_AT.csv"))
+
+
+```
+
+# Transforming variables for analysis
+
+## KFP to numeric
+
+```{r}
+
+data4analysis <- cleaned_data
+
+
+data4analysis <- data4analysis %>%
+  mutate(KFP_sum = rowSums(select(., starts_with("KFP")), na.rm = TRUE))
+
+table(data4analysis$KFP_sum)
+
+```
+
+## Intervention participation to numeric
+
+```{r}
+
+data4analysis <- data4analysis %>%
+  mutate(interventions = rowSums(select(., starts_with("Participate")), na.rm = TRUE))
+
+table(data4analysis$interventions)
+
+```
+
+Changing frame to one column
+
+```{r}
+# combining frames into one question
+data4analysis$Frame1_3
+data4analysis$Frame3
+
+
+data4analysis <- data4analysis %>%
+  mutate(frame = case_when (
+                  Frame1_3 == 1 ~ 1,
+                  Frame3 == 1 ~ 1,
+                  frame_c06 == "Health and Nutrition" ~ 1,
+         FALSE ~ 0
+         ))
+
+table(data4analysis$frame, useNA = 'always')
+```
+
+# Exporting to excel
+
+```{r}
+# exporting the merged data sets to the data files folder
+write_csv(data4analysis, file = here::here("Output/transform_data_AT.csv"))
+```
