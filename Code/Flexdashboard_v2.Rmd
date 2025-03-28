@@ -5,6 +5,8 @@ date: "2025-03-07"
 output:
   flexdashboard::flex_dashboard:
     storyboard: TRUE
+social: menu
+source_code: embed
 ---
 
 ```{r setup, include=FALSE}
@@ -13,8 +15,8 @@ knitr::opts_chunk$set(echo = FALSE)
 library(pacman)
 p_load(flexdashboard, dplyr, ggplot2, esquisse, plotly, DT, scales, readr, stringr)
 
-here::i_am("07_Afia/Flexdashboard_v2.Rmd")
-data_filtered <- read_csv(here::here("07_Afia/data_filtered_AT.csv"))
+here::i_am("Code/Flexdashboard_v2.Rmd")
+data_filtered <- read_csv(here::here("Output/data_filtered_AT.csv"))
 ```
 
 ------------------------------------------------------------------------
