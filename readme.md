@@ -16,11 +16,13 @@ This project was completed as a part of both the epidemiology and the data scien
 
 ## File structure:
 
-**Code -** The 'code' folder holds all code that has been written to clean the data, develop the graphs, and launch the flexdashboard.
+**Code -** The folder holds all code that has been written to clean the data, develop the graphs, and launch the flexdashboard.
 
-**Output -** The 'output' folder contains all content created by running code. This includes: cleaned data, graphs, and html widgets.
+**Output -** The folder contains all content created by running code. This includes: cleaned data, graphs, and html widgets.
 
-**Data -** The 'data' folder contains all raw data used for analysis.
+**Data -** The folder contains all raw data used for analysis.
+
+**Dashboard_Materials** - This folder contains all code written to create the interactive dashboard
 
 ## Cleaning the data:
 
