@@ -4,11 +4,11 @@ Understanding Food Security Drivers:
 
 </h1>
 
-<h2 align="center">
+<b style="font-size:20px;" align="center">
 
 Household Gender Structure and Child Nutrition Knowledge in the Takunda (Zimbabwe) and Titukulane (Malawi) Programs
 
-</h2>
+</b>
 
 <p align="center">
 
@@ -121,4 +121,4 @@ $$
 
 -   Produces a table of demographic characteristics, grouped by program
 
-## 
+
