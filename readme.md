@@ -1,9 +1,3 @@
-<p align="center">
-
-![](images/RSPH_shield_hz_294.png){width="358"}
-
-</p>
-
 <h1 align="center">
 
 Understanding Food Security Drivers:
@@ -128,7 +122,3 @@ $$
 -   Produces a table of demographic characteristics, grouped by program
 
 ## 
-
-![](images/clipboard-2352407762.png){width="176"}
-
-![](images/RSPH_shield_vt-01.png){width="159"}
