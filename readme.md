@@ -119,6 +119,6 @@ $$
 
 -   Produces a table of demographic characteristics, grouped by program
 
-### Impact and Importance
+## Impact and Importance
 
 This analysis is incredible timely, as organizations like CARE seek to improve food security outcomes while also understanding the social factors and structures that contribute to effective interventions. This dashboard explores how household gender structure may impact intervention success, and translates this information into digestible visualizations.
