@@ -222,13 +222,8 @@ data_filtered$HH_type_jitter <- as.numeric(factor(data_filtered$Gendered_HH_Type
 
 ```{r}
 
-# Create a new variable to seperate jitter points from boxplot
-data_filtered$HH_type_jitter <- as.numeric(factor(data_filtered$Gendered_HH_Type)) + 0.25  # Nudges jitter to the right
-
 boxplot_1B <- ggplot(data_filtered, aes(x= Gendered_HH_Type, y = KFP_sum, fill = program)) +
-  geom_boxplot(outlier.shape = NA, alpha = 0.5, width = 0.4, position = position_nudge(x = -0.25)) +  # Nudges boxplots left
-    geom_jitter(aes(x = HH_type_jitter, text = paste("Program:", program, "<br>Feeding Practices Known: ", KFP_sum, "<br>Age: ", Age, "<br>Sex: ", Sex, "<br>Interventions participated in: ", interventions)), 
-              width = 0.15, size = 2, alpha = 0.7)+
+  geom_boxplot(outlier.shape = NA, alpha = 0.5, width = 0.4, position = position_nudge(x = -0.25)) +
   scale_x_discrete(labels = label_wrap(20)) +  
   scale_fill_discrete(name = "Program")+
   scale_fill_manual(values = c('#F67601','#5C2163'))+
