@@ -24,7 +24,7 @@ data_filtered <- readRDS(here::here("Data/final_data.rds"))
 <h3>Household Gender Structure and Nutrition Knowledge in Malawi (Titukulane) and Zimbabwe (Takunda)</h3>
 
 | Topic | Details |
-|---------------------|---------------------------------------------------|
+|-----------------------|------------------------------------------------|
 | **Core Themes** | Care groups, nutritional cash transfer, dietary diversity, and food security |
 | **Geography** | Malawi (Titukulane) and Zimbabwe (Takunda) |
 | **Programs** | The Takunda and Titukulane programs are CARE intiatives funded by USAID. Both programs seek to reduce food insecurity through the participation in nutrition focused interventions. |
@@ -35,15 +35,12 @@ data_filtered <- readRDS(here::here("Data/final_data.rds"))
 | **Learn more about the programs** | <https://www.care.org/> |
 | **Github repository** | <https://github.com/fiatyus/TTK_Gender_Nutrition> |
 
-
-<table align="center">
-  <tr>
-    <td><img src="https://www.care.org/wp-content/uploads/2021/01/primary_logo_horizontal_min.svg" width="300"></td>
-    <td><img src="RSPH_shield_hz_294.png" width="300"></td>
-  </tr>
-</table>
-
-
+<h1 align="center">
+![](RSPH_shield_hz_294.png){width="318"}
+</h1>
+<h1 align="center">
+![](https://www.care.org/wp-content/uploads/2021/01/primary_logo_horizontal_min.svg){width="391"}
+</h1>
 
 
 # Methodology
@@ -119,16 +116,14 @@ Takunda
 
 </summary>
 
-
 -   Early initiation of breastfeeding
 -   Exclusive breast feeding
--   Age appropriate and timely 
+-   Age appropriate and timely
 -   Introduction of complementary feeding
 -   Continued breastfeeding up to 24 months
 -   Dietary diversity
 -   Minimum meal frequency
 -   Critical times of hand washing
-
 
 </details>
 
@@ -145,7 +140,7 @@ Titukulane
 -   Complementary feeding and continued breastfeeding after 6 months
 -   Child Dietary diversity
 -   Timely immunization
--   Micronutrient supplementation 
+-   Micronutrient supplementation
 
 </details>
 
@@ -337,7 +332,6 @@ ggplotly(KFP_v_GSoH_facet, tooltip = "text") %>%
 **Key Takeaways:**
 
 This plot compares knowledge by gendered structure of the household and program. This graph shows that program has a stronger impact on knowledge than gendered structure of the household. Knowledge rates remain comparable by gendered structure of the household.
-
 
 ### **Scatterplot** <br> Relationship between Interventions and Knowledge
 
