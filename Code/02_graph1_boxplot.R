@@ -1,10 +1,11 @@
 
-here::i_am("07_Afia/graph1_boxplot.R")
+here::i_am("Code/02_graph1_boxplot.R")
 
-data_filtered <- read_csv(here::here("07_Afia/data_filtered_AT.csv"))
-
+data_filtered <- readRDS(here::here("Data/final_data.rds"))
 
 library(ggplot2)
+library(dplyr)
+library(stringr)
 
 
 feeding_HH <- ggplot(data = data_filtered, aes(x= Gendered_HH_Type, y = KFP_sum)) +
@@ -56,3 +57,25 @@ feeding_HH_2_facet <- ggplot(data = data_filtered %>% filter(KFP_sum != 0), aes(
 
 
 feeding_HH_2_facet
+
+
+
+
+
+# program side by side
+KFP_known_final <- ggplot(data = data_filtered, aes(x= Gendered_HH_Type, y = KFP_sum, fill = program, color = program)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c('#F67601', '#BF7BB5'))+
+  scale_color_manual(values = c('#4E2A1F', '#5C2163'))+
+  labs(x = "Gendered Houshold Type",
+       y = "Total Feeding Practices Known",
+       title = "Comparing Gendered Household Type and \nFeeding Practices Known by Program") +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
+  theme(legend.position="bottom",
+        plot.background = element_rect(fill = "#FFF8ED", color = NA),  
+        panel.background = element_rect(fill = "#FFF8ED", color = NA),
+        legend.background = element_rect(fill = "#FFF8ED", color = NA))
+
+KFP_known_final
+
+ggsave("Output/Boxplot1.png",plot = KFP_known_final)

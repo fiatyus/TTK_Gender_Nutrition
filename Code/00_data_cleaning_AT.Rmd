@@ -20,14 +20,55 @@ pacman::p_load(here,readxl,haven,tidyverse)
 getwd() # confirm you're in the shared folder
 
 # here-i-am
-here::i_am("06_Code/Data_Cleaning.rmd")
+here::i_am("Code/00_data_cleaning_AT.rmd")
 
-tkd_raw <- read_excel(here::here("03_CARE data files/01_Takunda/PaBS Datasets/Takunda PaBS Data 2024.xlsx"))
+tkd_raw <- read_excel(here::here("Data/Raw Data/Takunda PaBS Data 2024.xlsx"))
 
-ttk_raw <- read_sav(here::here("03_CARE data files/02_Titukulane/TTK PaBS 2024 Datasets/data2024version1.sav"))
+ttk_raw <- read_sav(here::here("Data/Raw Data/data2024version1.sav"))
 
-tkd_cleaned <- tkd_raw
+tkd_cleaned <- tkd_raw %>% filter(!is.na(Z06Takundainterventionsparticipatedin))
 ttk_cleaned <- ttk_raw
+
+
+# adding ID values
+tkd_cleaned <- tkd_cleaned %>%
+  mutate(ID = paste0("TKD_", row_number()))
+
+ttk_cleaned <- ttk_cleaned %>%
+  mutate(ID = paste0("TTK_", row_number()))
+
+
+```
+
+# Calculating intervention participation
+
+```{r}
+intervention_list <- c(
+  "Care Group (Neighbor Women, Elderly Women, Men’s Fora)",
+  "Cash for Assets",
+  "Disaster Risk Reduction",
+  "Farmer Field Business School",
+  "Gendered Climate Vulnerability Capacity Assessment",
+  "Natural Resources Management",
+  "PTS/Lifeskills",
+  "Resilience Design",
+  "SAA Dialogues/Gender Messaging",
+  "Supplementary Feeding Programme",
+  "TVET",
+  "Village Savings & Loans Association",
+  "WASH"
+)
+
+
+# Count the number of interventions per person
+tkd_cleaned <- tkd_cleaned %>%
+  mutate(interventions = sapply(Z06Takundainterventionsparticipatedin, function(x) {
+    # Check how many interventions are listed for each person
+    sum(sapply(intervention_list, function(intervention) str_detect(x, fixed(intervention))))
+  }))
+
+tkd_cleaned$interventions <- as.numeric(tkd_cleaned$interventions)
+class(tkd_cleaned$interventions)
 ```
 
 # Filtering and renaming columns
@@ -37,7 +78,7 @@ ttk_cleaned <- ttk_raw
 ```{r}
 
 # TKD variable name reading in 
-TKD_names <- read_excel(here::here("06_Code/Mapping_Variables/TKD_Var_Names_AT.xlsx"))
+TKD_names <- read_excel(here::here("Data/Data_Mapping/TKD_Var_Names_AT.xlsx"))
   TKD_var_names <- TKD_names %>% pull(`Takunda Variable Names`)
   TKD_new_names <- TKD_names %>% pull(`New Names`)
 
@@ -82,11 +123,11 @@ class(tkd_cleaned$KFP_Initiation)
 table(tkd_cleaned$KFP_Comp_Feed)
 # changing participation to numeric
 
-tkd_participation_variables <- c("Participate_WASH", "Participate_CareGroup", "Participate_CashTransfer", "Participate_Disaster", "Participate_FFB", "Participate_GenderedClimate", "Participate_IGA", "Participate_Natural", "Participate_PTS", "Participate_ResilienceDesign", "Participate_SAADialoguesGender", "Participate_SuppFeeding", "Participate_TVET", "Participate_VillageSavings")
+tkd_participation_variables <- c("Participate_WASH", "Participate_CareGroup", "Participate_CashTransfer", "Participate_Disaster", "Participate_FFB", "Participate_GenderedClimate", "Participate_Natural", "Participate_PTS", "Participate_ResilienceDesign", "Participate_SAADialoguesGender", "Participate_SuppFeeding", "Participate_TVET", "Participate_VillageSavings")
 
 tkd_cleaned[tkd_participation_variables] <- sapply(tkd_cleaned[tkd_participation_variables], as.numeric)
 
-class(tkd_cleaned$Partcipate_WASH)
+class(tkd_cleaned$Participate_WASH)
 
 #changing household composition to numeric
 household_convert <- c("Female_15_29", "Female_30", "Men_15_29", "Men_30")
@@ -99,6 +140,7 @@ tkd_cleaned$Frame3 <- as.numeric(tkd_cleaned$Frame3)
 
 
 
+
 ```
 
 ## TTK
@@ -106,7 +148,7 @@ tkd_cleaned$Frame3 <- as.numeric(tkd_cleaned$Frame3)
 ```{r}
 
 # TTK variable name reading in
-TTK_names <- read_excel(here::here("06_Code/Mapping_Variables/TTK_Var_Names_AT.xlsx"))
+TTK_names <- read_excel(here::here("Data/Data_Mapping/TTK_Var_Names_AT.xlsx"))
   TTK_var_names <- TTK_names %>% pull(`Titikulane Names`)
   TTK_new_names <- TTK_names %>% pull(`New Names`)
   
@@ -180,7 +222,7 @@ ttk_cleaned <- ttk_cleaned %>%
 # changing participation to numeric
 
 ttk_participation_variables <- c("Participate_AgrLoan","Participate_CareGroup",
-"Participate_CashTransfer", "Participate_CommSupp", "Participate_Disaster", "Participate_DykeCon","Participate_IGA", "Participate_Irrigation", "Participate_Livestock",  "Participate_Marketing", "Participate_Meg", "Participate_Natural", "Participate_Radio", "Participate_SAADialoguesGender", "Participate_TVET_formal", "Participate_TVET_informal", "Participate_VillageSavings", "Participate_WASH", "Participate_WaterManage", "Participate_YouthGroup")
+"Participate_CashTransfer", "Participate_CommSupp", "Participate_Disaster", "Participate_DykeCon", "Participate_Irrigation", "Participate_Livestock",  "Participate_Marketing", "Participate_Meg", "Participate_Natural", "Participate_Radio", "Participate_SAADialoguesGender", "Participate_TVET_formal", "Participate_TVET_informal", "Participate_VillageSavings", "Participate_WASH", "Participate_WaterManage", "Participate_YouthGroup")
 
 ttk_cleaned[ttk_participation_variables] <- sapply(ttk_cleaned[ttk_participation_variables], as.numeric)
 
@@ -204,12 +246,16 @@ household_convert <- c("Female_15_29", "Female_30", "Men_15_29", "Men_30")
 ttk_cleaned$frame_c06 <- as.character(ttk_cleaned$frame_c06)
 table(ttk_cleaned$frame_c06)
 
+
+ttk_cleaned <- ttk_cleaned %>% mutate(interventions = rowSums(select(., starts_with("Participate")), na.rm = TRUE))
+
 ```
 
 # Merging data sets
 
 ```{r}
-
+tkd_cleaned$interventions <- as.numeric(tkd_cleaned$interventions)
+class(tkd_cleaned$interventions)
 # joining the two cleaned data sets
 cleaned_data <- full_join(tkd_cleaned, ttk_cleaned)
 
@@ -222,7 +268,7 @@ names(cleaned_data)
 ```{r}
 
 # exporting the merged data sets to the data files folder
-write_csv(cleaned_data, file = here::here("03_CARE data files/cleaned_data_AT.csv"))
+saveRDS(cleaned_data, file = here::here("Data/cleaned_data_AT.rds"))
 
 
 ```
@@ -246,9 +292,6 @@ table(data4analysis$KFP_sum)
 ## Intervention participation to numeric
 
 ```{r}
-
-data4analysis <- data4analysis %>%
-  mutate(interventions = rowSums(select(., starts_with("Participate")), na.rm = TRUE))
 
 table(data4analysis$interventions)
 
@@ -276,5 +319,5 @@ table(data4analysis$frame, useNA = 'always')
 
 ```{r}
 # exporting the merged data sets to the data files folder
-write_csv(data4analysis, file = here::here("07_Afia/transform_data_AT.csv"))
+saveRDS(data4analysis, file = here::here("Data/transform_data_AT.rds"))
 ```

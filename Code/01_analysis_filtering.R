@@ -1,8 +1,14 @@
 
-here::i_am("07_Afia/analysis_filtering.R")
+library(here)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(table1)
+
+here::i_am("Code/01_analysis_filtering.R")
 
 # full cleaned data set
-data <- read_csv(here::here("07_Afia/transform_data_AT.csv"))
+data <- readRDS(here::here("Data/transform_data_AT.rds"))
 
 
 
@@ -48,9 +54,8 @@ table(data_filtered$KFP)
 label(data_filtered$interventions) <- "Interventions Participated In"
 label(data_filtered$KFP_sum) <- "Feeding Practices Known"
 label(data_filtered$KFP) <- "Feeding Practices Known (binary)"
-label(data_filtered$interventions) <- "Interventions Participated In"
-
+label(data_filtered$Gendered_HH_Type) <- "Gendered Structure of the Household"
 
 # exporting new data set
 
-write_csv(data_filtered, file = here::here("07_Afia/data_filtered_AT.csv"))
+saveRDS(data_filtered, file = here::here("Data/final_data.rds"))

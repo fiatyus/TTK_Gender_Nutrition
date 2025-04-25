@@ -1,0 +1,419 @@
+---
+title: 'Understanding Food Security Drivers in Malawi and Zimbabwe'
+author: "Afia Tyus"
+date: "Spring 2025"
+output:
+  flexdashboard::flex_dashboard:
+    theme: spacelab
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(pacman)
+p_load(flexdashboard, dplyr, ggplot2, esquisse, plotly, DT, scales, readr, stringr, table1)
+
+here::i_am("Flexdashboard_TYUS.Rmd")
+data_filtered <- readRDS(here::here("Data/final_data.rds"))
+```
+
+# About
+
+<h2>**Understanding Food Security Drivers:**</h2>
+
+<h3>Household Gender Structure and Nutrition Knowledge in Malawi (Titukulane) and Zimbabwe (Takunda)</h3>
+
+| Topic | Details |
+|---------------------|---------------------------------------------------|
+| **Core Themes** | Care groups, nutritional cash transfer, dietary diversity, and food security |
+| **Geography** | Malawi (Titukulane) and Zimbabwe (Takunda) |
+| **Programs** | The Takunda and Titukulane programs are CARE intiatives funded by USAID. Both programs seek to reduce food insecurity through the participation in nutrition focused interventions. |
+| **Research question** | During FY 24, in both the Takunda and Titukulane programs, is there a relationship between the gendered structure of the household and child feeding and nutrition practice knowledge? What factors confound that relationship? |
+| **Background** | Food security remains one of the most pressing issues of our time. This project seeks to analyze the ways program interventions, internal behaviors, and demographics may impact measures of food security. |
+| **Project Status** | This project was completed as a part of both the epidemiology and the data science certificate capstone courses (EPI 598C and DATA 555 respectively). Launching of this interactive dashboard and github repository satisfied the requirements for the completion of the Rollins School of Public Health Data Science certificate. <br>Updates will not continue after final submission on April 25th. |
+| **Impact and Importance** | This analysis is incredible timely, as organizations like CARE seek to improve food security outcomes while also understanding the social factors and structures that contribute to effective interventions. This dashboard explores how household gender structure may impact intervention success, and translates this information into digestible visualizations. |
+| **Learn more about the programs** | <https://www.care.org/> |
+| **Github repository** | <https://github.com/fiatyus/TTK_Gender_Nutrition> |
+
+
+<table align="center">
+  <tr>
+    <td><img src="https://www.care.org/wp-content/uploads/2021/01/primary_logo_horizontal_min.svg" width="300"></td>
+    <td><img src="RSPH_shield_hz_294.png" width="300"></td>
+  </tr>
+</table>
+
+
+
+
+# Methodology
+
+## Column {.tabset}
+
+### Demographic Distributions
+
+<h2>Study Population Descriptive Statistics by Program</h2>
+
+<p>Population includes all participants asked feeding practice knowledge questions</p>
+
+```{r}
+# rendering for continuous variables
+my.render.cont <- function(x, name, ...) {
+  if (!is.numeric(x)) return(render.categorical.default(x))
+  what <- switch(name,
+                 Age  = "Median [Min, Max]",
+                 interventions = "Median [Min, Max]",
+                 KFP_sum = "Median [Min, Max]"
+                 )
+  parse.abbrev.render.code(c("", what))(x)
+}
+table_Afia_v1 <- table1(~Gendered_HH_Type + Age + Sex + 
+                       interventions + KFP_sum + KFP | program, 
+                   data = data_filtered,
+                   topclass="Rtable1-zebra",
+                   render = my.render.cont
+)
+table_Afia_v1
+```
+
+### Variables Explained
+
+<h2>Understanding the Variables</h2>
+
+<h3><strong>👨‍👩‍👧 Gendered Structure of the Household (GSoH)</strong></h3>
+
+-   **1** = Adult Male, no Adult Female (**MnF**)\
+-   **2** = Adult Female, no Adult Male (**FnM**)\
+-   **3** = Adult Male and Adult Female (**M&F**)\
+-   **4** = Female Child, no Adults (**CNAF**)\
+-   **5** = Male Child, no Adults (**CNAM**)
+
+<em>Note: Categories 3, 4, and 5 were removed from analyses due to small sample size.</em>
+
+<h3><strong> 🎂 Age </strong></h3>
+
+A continuous variable representing participant age (in years).
+
+<h3><strong>⚥ Sex </strong></h3>
+
+Biological sex as reported by participants: **male** or **female**.
+
+<h3><strong>📊 Intervention Participation</strong></h3>
+
+Total number of interventions each participant was involved in.
+
+<h3><strong>🍽️ Feeding Practices Known</strong></h3>
+
+Participants were asked about child feeding practices they were aware of during the PaBS survey.\
+This measure reflects **knowledge**, not actual behavior.
+
+Scores ranged from **0 to 7 known practices**.
+
+*Click below to learn what practice were examined for each program*
+
+<details>
+
+<summary style="font-weight:bold;">
+
+Takunda
+
+</summary>
+
+
+-   Early initiation of breastfeeding
+-   Exclusive breast feeding
+-   Age appropriate and timely 
+-   Introduction of complementary feeding
+-   Continued breastfeeding up to 24 months
+-   Dietary diversity
+-   Minimum meal frequency
+-   Critical times of hand washing
+
+
+</details>
+
+<details>
+
+<summary style="font-weight:bold;">
+
+Titukulane
+
+</summary>
+
+-   Initiation of breastfeeding within one hour of delivery
+-   Exclusive breastfeeding for 6 months
+-   Complementary feeding and continued breastfeeding after 6 months
+-   Child Dietary diversity
+-   Timely immunization
+-   Micronutrient supplementation 
+
+</details>
+
+<h3><strong>📉 Feeding Practices Known (Binary)</strong></h3>
+
+Because the programs evaluated **different** sets of practices, scores were transformed into a **binary** variable:\
+- ❌ **0 practices known**\
+- ✔️ **1 or more practices known**
+
+### Dataset description
+
+<h2>Dataset source and information</h2>
+
+This project combines the **FY24 data** and results of the **‘Participant Annual Based Survey’ (PaBS)** of the two programs: ‘Takunda’ of Zimbabwe and ‘Titukulane’ of Malawi.
+
+Both programs involve the participation in up to eighteen (18) intervention programs aimed at improving food security outcomes. Survey participants are a subset of the participants in both programs, 1332 participants surveyed for ‘Takunda’ and 1293 participants surveyed for ‘Titukulane’ program.
+
+Results were gathered through **in person interviews**.
+
+While the **full** **datasets themselves are confidential**, the findings can be shared and presented as a part of the Rollins epidemiology capstone project.
+
+**Key variables include:**
+
+-   Gendered structure of the household
+
+-   Knowledge of feeding practices
+
+-   Age(years)
+
+-   Sex(male/female)
+
+-   Country/program
+
+## Column {data-width="250"}
+
+### Takunda Participants
+
+```{r}
+TKD_participants <- data_filtered %>% filter(program=="TAKUNDA") %>%  summarise(n())
+valueBox(TKD_participants, icon = "fa-globe")
+```
+
+### Titukulane Participants
+
+```{r}
+TTK_participants <- data_filtered %>% filter(program=="TITUKULANE") %>%  summarise(n())
+valueBox(TTK_participants, icon = "fa-globe")
+```
+
+### Adult Female no Adult Male Households
+
+```{r}
+TTK_participants <- data_filtered %>% filter(Gendered_HH_Type=="Adult Female no Adult Male (FnM)") %>%  summarise(n())
+valueBox(TTK_participants, icon = "fa-female")
+```
+
+### Adult Male and Adult Female Households
+
+```{r}
+TTK_participants <- data_filtered %>% filter(Gendered_HH_Type=="Adult Male and Adult Female (M&F)") %>%  summarise(n())
+valueBox(TTK_participants, icon = "fa-group")
+```
+
+### Participants know 1 or more feeding practices
+
+```{r}
+TTK_participants <- data_filtered %>% filter(KFP == "One or more (1+)") %>%  summarise(n())
+valueBox(TTK_participants, icon = "fa-school")
+```
+
+# Interactive Visualizations {.storyboard}
+
+```{r}
+# Create a new variable to seperate jitter points from boxplot
+data_filtered$HH_type_jitter <- as.numeric(factor(data_filtered$Gendered_HH_Type)) + 0.25  # Nudges jitter to the right
+```
+
+### **Boxplot** <br>Gendered Structure of the Household (GSoH) and Total Knowledge (count)
+
+```{r}
+
+# Create a new variable to seperate jitter points from boxplot
+data_filtered$HH_type_jitter <- as.numeric(factor(data_filtered$Gendered_HH_Type)) + 0.25  # Nudges jitter to the right
+
+boxplot_1B <- ggplot(data_filtered, aes(x= Gendered_HH_Type, y = KFP_sum, fill = program)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.5, width = 0.4, position = position_nudge(x = -0.25)) +  # Nudges boxplots left
+    geom_jitter(aes(x = HH_type_jitter, text = paste("Program:", program, "<br>Feeding Practices Known: ", KFP_sum, "<br>Age: ", Age, "<br>Sex: ", Sex, "<br>Interventions participated in: ", interventions)), 
+              width = 0.15, size = 2, alpha = 0.7)+
+  scale_x_discrete(labels = label_wrap(20)) +  
+  scale_fill_discrete(name = "Program")+
+  scale_fill_manual(values = c('#F67601','#5C2163'))+
+  labs(x = "Gendered Household Type",
+       y = "Total Feeding Practices Known (count)",
+       title = "Gendered Household Type and Feeding Practices Known") +
+  theme_minimal()
+
+note_2 <- "Note: For more information on feeding practices visit the methodology page"
+
+plotly_1B <- ggplotly(boxplot_1B, tooltip = "text") %>% 
+    layout(margin = list(l = 50, r = 50, b = 100, t = 50),
+         annotations = list(x = 0.8, y = -0.3, text = str_wrap(note_2, 50),
+                            xref='paper', yref='paper', showarrow = F, 
+                            xanchor='auto', yanchor='auto', xshift=100, yshift=-20,
+                            font = list(size = 10)))
+
+plotly_1B <- plotly_1B %>% layout(legend = list(orientation = "h", x = 0, y = -0.2))
+
+plotly_1B %>% layout(boxmode = "group")
+
+```
+
+------------------------------------------------------------------------
+
+**Key Takeaways:**
+
+This graph provides a view of the distribution of feeding practices known, separated by gendered household type. When viewing this widget, we see that across both household types, participants can know between 0 and 7 practices. It does lead to the belief that those in the Titukulane (purple) program on average know fewer feeding practices, while those in Takunda (orange) know significantly more.
+
+### **Barchart** (participant count) <br> Program and Knowledge (binary)
+
+```{r}
+
+# Create a new variable to seperate jitter points from boxplot
+data_filtered$HH_type_jitter <- as.numeric(factor(data_filtered$Gendered_HH_Type)) + 0.25  # Nudges jitter to the right
+
+
+# Calculate counts per program and KFP
+data_with_count <- data_filtered %>%
+  count(program, KFP) %>%
+  mutate(text = paste("Program:", program, "<br>Feeding Practices Known:", KFP, "<br>Count:", n))
+
+# Create the bar chart with the calculated counts
+bar_chart <- ggplot(data = data_with_count, aes(fill = KFP, x = program, y = n)) +
+  geom_bar(stat = "identity", position = "dodge", aes(text = text)) + 
+  scale_x_discrete(labels = label_wrap(20)) +
+  scale_fill_manual(values = c('#5C2163', '#F67601'))+
+  labs(x = "Program",
+       y = "Participants (count)",
+       title = "Program and Feeding Practices Known")
+
+# Convert to plotly and specify the tooltip
+ggplotly(bar_chart, tooltip = "text") %>% 
+  layout(legend = list(orientation = "h", x = 0, y = -0.15))
+
+```
+
+------------------------------------------------------------------------
+
+**Key Takeaways:**
+
+This barchart shows feeding practices known as a binary variable with participants either knowing 0 practices or 1 or more practices. Without the noise of gendered household type, this graph clearly shows that Takunda participants are more likely to know 1 or more feeding practices.
+
+### **Barchart** (proportion)<br>GSoH, Program, and Knowledge (binary)
+
+```{r}
+data_with_count <- data_filtered %>%
+  count(Gendered_HH_Type, KFP) %>%
+  mutate(text = paste("GSoH:", Gendered_HH_Type, "<br>Feeding Practices Known:", KFP, "<br>Count:", n))
+
+data_with_count_facet <- data_filtered %>%
+  count(Gendered_HH_Type, KFP, program) %>% 
+  mutate(text = paste("GSoH:", Gendered_HH_Type, "<br>Feeding Practices Known:", KFP, "<br>Count:", n, "<br>Program:", program))
+
+data_with_count_facet <- data_with_count_facet %>% mutate(GSoH = 
+  case_when(Gendered_HH_Type == "Adult Female no Adult Male (FnM)" ~ "FnM",
+            Gendered_HH_Type == "Adult Male and Adult Female (M&F)" ~ "M&F")
+)
+
+KFP_v_GSoH_facet <- ggplot(data = data_with_count_facet, aes(x= GSoH, y=n, fill = KFP)) +
+  geom_bar(stat = "identity", position = "fill", aes(text = text))+
+  facet_wrap(~program)+
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20))+
+  labs(x = "Gendered Structure of the Household",
+       y = "Proportion of Participants",
+       title = "Knowledge by Gendered Structure of the Household and Program",
+       fill = "Feeding Practice's Known")+
+  scale_fill_manual(values = c('#5C2163', '#F67601'))+
+  theme(legend.position="bottom",
+        strip.background = element_rect(fill = "#BF7BB5", color = NA),
+        strip.text = element_text(color = "white", face = "bold"))
+
+
+ggplotly(KFP_v_GSoH_facet, tooltip = "text") %>% 
+  layout(legend = list(orientation = "h", x = 0, y = -0.15))
+
+```
+
+------------------------------------------------------------------------
+
+**Key Takeaways:**
+
+This plot compares knowledge by gendered structure of the household and program. This graph shows that program has a stronger impact on knowledge than gendered structure of the household. Knowledge rates remain comparable by gendered structure of the household.
+
+
+### **Scatterplot** <br> Relationship between Interventions and Knowledge
+
+```{r}
+
+interventions_v_KFP <- data_filtered %>% group_by(interventions, KFP_sum) %>%
+  mutate(count = n()) %>%
+  ggplot(aes(x = interventions, y = KFP_sum, color = program, size = count)) +
+  geom_point(aes(text = paste("Program: ", program, "<br>Feeding Practices Known: ", KFP_sum, "<br>Interventions participated in: ", interventions, "<br>Participants: ", count))) +
+  geom_smooth(method = "lm", se=FALSE) +
+  labs(x = "Interventions Participated In",
+       y = "Feeding Practices Known",
+       title = "Intervention Participation and Feeding Practice Knowledge")+
+  scale_color_manual(values = c('#5C2163', '#F67601'))
+
+ggplotly(interventions_v_KFP, tooltip = "text") %>% 
+  layout(legend = list(orientation = "h", x = 0, y = -0.2))
+
+```
+
+------------------------------------------------------------------------
+
+**Key Takeaways:**
+
+This graph shows that interventions participated in has a slightly positive relationship with feeding practices known. Titukulane participants have a wider range of total interventions participated in (1 to 18), while Takunda participants participated in 1 to 10 interventions.
+
+# See the Data
+
+### This interactive data table allows stakeholders to view and sort through the cleaned and mapped dataset. These programs have never been analyzed together (to date), as a result being able to easily view the new variables will aid in the applications of the research.
+
+```{r}
+
+# Rename columns with title case and add units in parentheses
+data_table <- data_filtered %>%
+  select(
+    Program = program,
+    District = District, 
+    Cluster = Cluster, 
+    Village = Village, 
+    Ward = Ward,
+    `Gendered Household Type` = Gendered_HH_Type,
+    `Age (Years)` = Age,
+    `Interventions Participated In` = interventions,
+    `Sex` = Sex,
+    `Feeding Practices Known` = KFP_sum,
+    `Feeding Practices (binary)` = KFP,
+    `Men (15 - 29 years)` = Men_15_29,
+    `Men (30+ years)` = Men_30,
+    `Women (15 - 29 years)` = Female_15_29,
+    `Women (30+ years)` = Female_30
+  )
+
+# Create interactive DataTable
+table_1 <- datatable(data_table, 
+                     extensions = 'Buttons',
+          options = list(
+            pageLength = 10,       # Show 10 rows per page by default
+            autoWidth = TRUE,      # Auto adjust column width
+            searching = TRUE,      # Enable search box
+            dom = 'Bfrtip',
+            buttons = list('copy', 'print', list(
+        extend = 'collection',
+        buttons = c('csv', 'excel', 'pdf'),
+        text = 'Download')),
+            fillContainer = TRUE,
+            scrollX = TRUE, # enabling horizontal scrolling
+            scrollY = "400px", # enabling vertical scrolling
+            dom = 'Blfrtip',       # Show filter dropdowns
+            columnDefs = list(     
+              list(orderable = TRUE, targets = '_all')  # Make all columns sortable
+            )
+          ),
+          rownames = FALSE,        # Hide row numbers
+          filter = "top"           # Add column filters
+)
+
+table_1
+
+```

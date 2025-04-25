@@ -48,8 +48,6 @@ This project was completed as a part of both the epidemiology and the data scien
 
 **Code -** The folder holds all code that has been written to clean the data, develop the graphs, and launch the flexdashboard.
 
-**Dashboard_Materials** - This folder contains all code written to create the interactive dashboard
-
 **Data -** The folder contains all raw data used for analysis.
 
 **Output -** The folder contains all content created by running code. This includes: cleaned data, graphs, and html widgets.
@@ -120,5 +118,3 @@ $$
 `Code/06_table1.R`
 
 -   Produces a table of demographic characteristics, grouped by program
-
-
